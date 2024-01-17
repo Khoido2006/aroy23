@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="checkout.css">
+
+    <title>ÀROY</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #customizationInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        #customizeConfirm {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #customizeConfirm:hover {
+            background-color: #45a049;
+        }
+        .clear-cart-btn {
+            margin-top: 20px;
+            text-align: right; 
+        }
+       
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loadingMessage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #333;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <div id="loadingOverlay" class="overlay">
+        <div class="spinner"></div>
+        <div id="loadingMessage">Processing your order...</div>
+    </div>
+
+    <div id="confirmationOverlay" class="overlay">
+        <div id="confirmationMessage">Thank you for your order! Your order has been received.</div>
+    </div>
+
+    <div class="logo">
+        <img src="logo.png" alt="">
+    </div>
+    <div class="back">
+        <button>
+            <a href="index.html">BACK</a>
+        </button>
+    </div>
+    <div class="container_popup">
+        <div class="popup" id = "popup">
+            <img src="tick.png" alt="">
+            <h2>Thank You!</h2>
+            <p>Your order has been received.</p>
+            <button type="button" onclick="closePopup()">OK</button>
+        </div> 
+    </div>
+    <div class="container">
+        <div class="cash">  
+            <button id="check_out" onclick="openPopup()">Thanh Toán Bằng Tiền Mặt</button>
+        </div>
+        <div class="qr_code">
+            <img src="qr.jpg" alt=""/> 
+            <button id="check_out" onclick="openPopup()">Thanh Toán Bằng QR</button>
+        </div>
+    </div>
+    
+
+    <div id="customizationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="margin: 0px;margin-top:30px;">Customize Your Order</h2>
+            <label for="customizationInput">Enter your preferences:</label>
+            <input type="text" id="customizationInput">
+            <button id="customizeConfirm">Confirm</button>
+        </div>
+    </div>
+
+    <script>
+
+
+        const btn = document.querySelectorAll(".product-items button");
+        const customizationModal = document.getElementById("customizationModal");
+        const customizationInput = document.getElementById("customizationInput");
+        const customizeConfirm = document.getElementById("customizeConfirm");
+        const checkoutBtn = document.getElementById("checkoutBtn");
+        const loadingOverlay = document.getElementById("loadingOverlay");
+        const confirmationOverlay = document.getElementById("confirmationOverlay");
+
+        const orderData = [
+  'Product Name 1',
+  'Price 1',
+  'Quantity 1',
+];
+        let popup = document.getElementById("popup");
+        let checkout_btn = document.getElementById("check_out");
+
+        function openPopup() {
+            popup.classList.add("open-popup");
+
+        }
+        function closePopup() {
+            popup.classList.remove("open-popup");
+        }
+
+        checkoutBtn.addEventListener("click", function () {
+            showLoadingOverlay();
+            setTimeout(function () {
+                hideLoadingOverlay();
+                alert("Your order has been received!");
+                showConfirmationOverlay()}, 10000);
+
+                const orderData = [
+                    'Product Name 1',
+                    'Price 1',
+                    'Quantity 1',
+                ];
+        });
+
+        function showConfirmationOverlay() {
+            confirmationOverlay.style.display = "block";
+            setTimeout(function () {
+                confirmationOverlay.style.display = "none";
+            }, 100000);
+        }
+
+        function showLoadingOverlay() {
+            loadingOverlay.style.display = "block";
+        }
+
+        function hideLoadingOverlay() {
+            loadingOverlay.style.display = "none";
+        }
+
+        function showConfirmationOverlay() {
+            var confirmationOverlay = document.getElementById("confirmationOverlay");
+            confirmationOverlay.style.display = "block";
+
+            setTimeout(function () {
+                confirmationOverlay.style.display = "none";
+            }, 5000);
+        }
+
+        btn.forEach(function (button, index) {
+            button.addEventListener("click", function (event) {
+                var btnItem = event.target;
+                var product = btnItem.parentElement;
+                var productImg = product.querySelector("img").src;
+                var productName = product.querySelector("h1").innerText;
+                var productPrice = product.querySelector("span").innerText;
+
+                openCustomizationModal(productName, productPrice, productImg);
+            });
+        });
+
+        function openCustomizationModal(productName, productPrice, productImg) {
+            console.log("Opening customization modal...");
+
+            customizationModal.style.display = "block";
+
+            customizeConfirm.onclick = function () {
+                console.log("Confirm button clicked...");
+                var customizationDetails = customizationInput.value;
+
+                addcart(productPrice, productImg, productName, customizationDetails);
+
+                customizationInput.value = "";
+                customizationModal.style.display = "none";
+            };
+        }
+
+        function addcart(productPrice, productImg, productName, customizationDetails) {
+            var addtr = document.createElement("tr");
+            var trcontent =
+                '<tr><td><img style="width:70px" src="' +
+                productImg +
+                '" alt=""></td><td><p><span>' +
+                productPrice +
+                '</span><sup>đ</sup></p></td><td><input style ="width: 30px;outline: none;"type="number" value="1" min="0"></td><td style="cursor : pointer;" ><span class="cart-delete">Delete</span></td></tr>';
+
+            if (customizationDetails.trim() !== "") {
+                trcontent += '<tr><td colspan="4">Customization: ' + customizationDetails + '</td></tr>';
+            }
+
+            addtr.innerHTML = trcontent;
+            var cartTable = document.querySelector("tbody");
+            cartTable.append(addtr);
+            cartotal();
+            deleteCart();
+            inputchange();
+        }
+
+        function cartotal(removedItemPrice) {
+    var cartItem = document.querySelectorAll("tbody tr");
+    var totalC = 0;
+
+    cartItem.forEach(function (item) {
+        var inputValue = item.querySelector("input").value;
+        var productPrice = item.querySelector("td:nth-child(2) p span").innerText;
+
+        totalA = inputValue * productPrice * 1000;
+
+        if (removedItemPrice && removedItemPrice === productPrice) {
+            // Subtract the removed item's amount from the total
+            totalC -= totalA;
+        } else {
+            totalC += totalA;
+        }
+    });
+
+    var totalFinal = totalC.toLocaleString("de-DE");
+    var cartTotalFinal = document.querySelector(".price-total span");
+    cartTotalFinal.innerHTML = totalFinal;
+    inputchange();
+}
+
+
+        function deleteCart() {
+        var cartItem = document.querySelectorAll("tbody tr");
+        for (var i = 0; i < cartItem.length; i++) {
+        var deleteBtn = cartItem[i].querySelector(".cart-delete");
+        deleteBtn.addEventListener("click", function (event) {
+            var cartItemToRemove = event.target.parentElement.parentElement;
+            var productPrice = cartItemToRemove.querySelector("td:nth-child(2) p span").innerText;
+            cartItemToRemove.remove();
+            cartotal(productPrice);  
+        });
+    }
+}
+
+        function inputchange() {
+            var cartItem = document.querySelectorAll("tbody tr");
+            for (var i = 0; i < cartItem.length; i++) {
+                var inputValue = cartItem[i].querySelector("input");
+                inputValue.addEventListener("change", function () {
+                    cartotal();
+                });
+            }
+        }
+
+        function clearCart() {
+            var clearBtn = document.querySelector(".clear-cart-btn");
+            clearBtn.addEventListener("click", function () {
+                var cartItems = document.querySelectorAll("tbody tr");
+                cartItems.forEach(function (item) {
+                    item.remove();
+                });
+                cartotal();
+            });
+        }
+
+        function checkout() {
+            var checkoutBtn = document.getElementById("checkoutBtn");
+            checkoutBtn.addEventListener("click", function () {
+                clearCart();
+            });
+        }
+
+        function validateQuantityInput() {
+            var quantityInputs = document.querySelectorAll("tbody input");
+            quantityInputs.forEach(function (input) {
+                input.addEventListener("input", function () {
+                    this.value = this.value.replace(/\D/g, "");
+                    if (this.value === "") this.value = "1";
+                    cartotal();
+                });
+            });
+        }
+
+        function itemHoverEffect() {
+            var productItems = document.querySelectorAll(".product-item");
+            productItems.forEach(function (item) {
+                item.addEventListener("mouseenter", function () {
+                    this.style.border = "2px solid #ff9900";
+                });
+                item.addEventListener("mouseleave", function () {
+                    this.style.border = "";
+                });
+            });
+
+
+        }
+        deleteCart();
+        inputchange();
+        clearCart();
+        checkout();
+        validateQuantityInput();
+        itemHoverEffect();
+    </script>
+</body>
+</html>
