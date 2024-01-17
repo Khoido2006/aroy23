@@ -1,6 +1,6 @@
 const express = require('express');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const csvWriter = require('csv-writer').createObjectCsvWriter;
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const cors = require('cors');
 
 const app = express();
@@ -19,16 +19,27 @@ const spreadsheetId = '1tb4vt0Aui4BySXg7Lu7ytp6iGV_D9G2j7V71HjvmBPQ';
 
 app.use(express.json());
 
+// Handle POST requests to submit orders
 app.post('/submitOrder', async (req, res) => {
   try {
+    console.log('Order submission started.');
+
     const { orderDetails } = req.body;
 
-    // Send data to Google Sheets
-    await sendToGoogleSheets(orderDetails);
+    console.log('Order details:', orderDetails);
 
-    // Send data to CSV file
-    await sendToCSV(orderDetails);
+    const doc = new GoogleSpreadsheet(spreadsheetId);
+    await doc.useServiceAccountAuth(creds);
+    await doc.loadInfo();
 
+    const sheet = doc.sheetsByIndex[0]; // Assuming the first sheet
+
+    for (const order of orderDetails) {
+      const { productName, quantity, price } = order;
+      await sheet.addRow({ 'Món ăn': productName, 'Số Lượng': quantity, 'Giá': price });
+    }
+
+    console.log('Order processing completed successfully.');
     res.status(200).send('Order received successfully.');
   } catch (error) {
     console.error('Error processing order:', error.message);
@@ -36,51 +47,50 @@ app.post('/submitOrder', async (req, res) => {
   }
 });
 
-async function sendToGoogleSheets(orderDetails) {
-  const doc = new GoogleSpreadsheet(spreadsheetId);
-  await doc.useServiceAccountAuth(creds);
-  await doc.loadInfo();
+// Handle GET requests to the root path
+app.get('/', (req, res) => {
+  res.send('Hello, your server is running!');
+});
 
-  const sheet = doc.sheetsByIndex[0];
+// Handle POST requests to submit orders to CSV
+app.post('/submitOrderToCSV', async (req, res) => {
+  try {
+    console.log('Order submission to CSV started.');
 
-  for (const order of orderDetails) {
-    const { productName, quantity, price } = order;
-    await sheet.addRow({ 'Món ăn': productName, 'Số Lượng': quantity, 'Giá': price });
+    const { orderDetails } = req.body;
+
+    console.log('Order details:', orderDetails);
+
+    // Define CSV writer
+    const csvWriter = createCsvWriter({
+      path: 'orders.csv',
+      header: [
+        { id: 'timestamp', title: 'Timestamp' },
+        { id: 'quantity', title: 'Quantity' },
+        { id: 'price', title: 'Price' },
+      ],
+      append: true, // Append to the existing file
+    });
+
+    // Prepare records
+    const records = orderDetails.map((order) => {
+      return {
+        timestamp: new Date().toISOString(),
+        quantity: order.quantity,
+        price: order.price,
+      };
+    });
+
+    // Write to CSV
+    await csvWriter.writeRecords(records);
+
+    console.log('Order processing to CSV completed successfully.');
+    res.status(200).send('Order received and saved to CSV successfully.');
+  } catch (error) {
+    console.error('Error processing order to CSV:', error.message);
+    res.status(500).send('Internal Server Error: ' + error.message);
   }
-
-  console.log('Data sent to Google Sheets successfully.');
-}
-
-const fs = require('fs');
-
-async function sendToCSV(orderDetails) {
-  const csvWriterInstance = csvWriter({
-    path: 'orders.csv',
-    header: [
-      { id: 'timestamp', title: 'Timestamp' },
-      { id: 'productName', title: 'Product Name' },
-      { id: 'quantity', title: 'Quantity' },
-      { id: 'price', title: 'Price' },
-    ],
-    append: true, // Open the file in append mode
-  });
-
-  const records = orderDetails.map((order) => ({
-    timestamp: new Date().toISOString(),
-    productName: order.productName,
-    quantity: order.quantity,
-    price: order.price,
-  }));
-
-  console.log('File Path:', 'orders.csv');
-  console.log('Headers:', csvWriterInstance.header);
-  console.log('Records:', records);
-
-  await csvWriterInstance.writeRecords(records);
-
-  console.log('Data sent to CSV file successfully.');
-}
-
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://0.0.0.0:${PORT}`);
