@@ -299,32 +299,42 @@ function exportOrderToExcel(orderDetails) {
     saveOrdersToStorage(allOrders);
 }
 
-function downloadAllOrders() {
-    allOrders = getStoredOrders();
 
-    if (allOrders.length === 0) {
-        alert("No orders to download.");
-        return;
+function downloadAllOrders() {
+        allOrders = getStoredOrders();
+
+        if (allOrders.length === 0) {
+            alert("No orders to download.");
+            return;
+        }
+
+        var wsData = [["Món ăn", "Giá", "Số Lượng", "Customization"]];
+        allOrders.forEach(function (order) {
+            var productName = order[0];
+            var productPrice = order[1];
+            var quantity = order[2];
+            var customizationDetails = order[3];
+
+            wsData.push([productName, productPrice, quantity, customizationDetails]);
+        });
+
+        var ws = XLSX.utils.aoa_to_sheet(wsData);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "All Orders");
+
+        // Save the workbook
+        var fileName = "all_orders.xlsx";
+        XLSX.writeFile(wb, fileName);
+
+        // Clear the stored orders after downloading
+        clearStoredOrders();
+        // Clear the cart UI
+        clearCart();
     }
 
-    var wsData = [["Món ăn", "Giá", "Số Lượng", "Customization"]];
-    allOrders.forEach(function (order) {
-        var productName = order[0];
-        var productPrice = order[1];
-        var quantity = order[2];
-        var customizationDetails = order[3];
-
-        wsData.push([productName, productPrice, quantity, customizationDetails]);
-    });
-
-    var ws = XLSX.utils.aoa_to_sheet(wsData);
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "All Orders");
-
-    // Save the workbook
-    var fileName = "all_orders.xlsx";
-    XLSX.writeFile(wb, fileName);
-}
+    function clearStoredOrders() {
+        localStorage.removeItem('allOrders');
+    }
 
 checkoutBtn.addEventListener("click", function () {
     var orderDetails = [];
