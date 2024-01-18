@@ -9,17 +9,6 @@
 
     <title>ÀROY</title>
     <style>
-        #orderConfirmationOverlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 9999;
-}
-
         .modal {
             display: none;
             position: fixed;
@@ -139,9 +128,6 @@
     <div id="confirmationOverlay" class="overlay">
         <div id="confirmationMessage">Thank you for your order! Your order has been received.</div>
     </div>
-    <div id="orderConfirmationOverlay" class="overlay">
-    <div id="confirmationMessage">Thank you for your order! Your order has been received.</div>
-</div>
 
 
     <div class="logo">
@@ -191,9 +177,7 @@
         const checkoutBtn = document.getElementById("checkoutBtn");
         const loadingOverlay = document.getElementById("loadingOverlay");
         const confirmationOverlay = document.getElementById("confirmationOverlay");
-        const orderConfirmationOverlay = document.getElementById("orderConfirmationOverlay");
-        const orderConfirmationMessage = document.getElementById("confirmationMessage");
-
+        
 
         const orderData = [
   'Product Name 1',
@@ -225,27 +209,6 @@
                 ];
         });
 
-function showConfirmationOverlay() {
-    // Show the overlay
-    loadingOverlay.style.display = "block";
-    
-    // Hide the confirmation message initially
-    orderConfirmationMessage.style.display = "none";
-
-    setTimeout(function () {
-        // Hide the loading overlay
-        hideLoadingOverlay();
-
-        // Show the confirmation message
-        orderConfirmationMessage.style.display = "block";
-
-        // Set a timeout to hide the confirmation overlay after a certain duration
-        setTimeout(function () {
-            orderConfirmationOverlay.style.display = "none";
-        }, 5000); // Adjust the duration as needed
-    }, 10000); // Adjust the duration as needed
-}
-
         function showLoadingOverlay() {
             loadingOverlay.style.display = "block";
         }
@@ -255,7 +218,6 @@ function showConfirmationOverlay() {
         }
 
         function showConfirmationOverlay() {
-            var confirmationOverlay = document.getElementById("confirmationOverlay");
             confirmationOverlay.style.display = "block";
 
             setTimeout(function () {
